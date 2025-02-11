@@ -1,7 +1,7 @@
 'use server';
 
 import { auth } from '@/lib/firebase';
-import { createSession } from '@/lib/session';
+import { createSession, deleteSession } from '@/lib/session';
 import {
     createUserWithEmailAndPassword,
     GoogleAuthProvider,
@@ -9,6 +9,7 @@ import {
     signInWithPopup,
     signOut as signoutUser,
 } from 'firebase/auth';
+import { redirect } from 'next/navigation';
 
 const provider = new GoogleAuthProvider();
 
@@ -23,34 +24,27 @@ export const signIn = async (
         return { message: 'All fields are required' };
     }
 
-    const userResponse = await signInWithEmailAndPassword(
-        auth,
-        email as string,
-        password as string,
-    )
-        .then((userCredential) => {
-            // Signed in
-            const user = userCredential.user;
-            console.log(user);
+    try {
+        const userCredential = await signInWithEmailAndPassword(
+            auth,
+            email as string,
+            password as string,
+        );
 
-            // await createSession(user.id);
-            // // 5. Redirect user
-            // redirect('/profile');
+        const user = userCredential.user;
 
-            return { message: 'Sign in successful' };
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
+        await createSession(user.uid);
 
-            console.log('Sign in error: ', errorCode, errorMessage);
+        redirect('/');
 
-            return {
-                message: 'Invalid credentials',
-            };
-        });
+        return { message: 'Sign in successful' };
+    } catch (error) {
+        console.error('Sign in error: ', error.code, error.message);
 
-    return userResponse;
+        return {
+            message: 'Invalid credentials',
+        };
+    }
 };
 
 export const signUp = async (
@@ -70,51 +64,53 @@ export const signUp = async (
         return { message: 'Passwords do not match' };
     }
 
-    const userResponse = createUserWithEmailAndPassword(
-        auth,
-        email as string,
-        password as string,
-    )
-        .then((userCredential) => {
-            // Signed up
-            const user = userCredential.user;
-            console.log(user);
-            return { message: 'User created successfully' };
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
+    try {
+        const userCredential = await createUserWithEmailAndPassword(
+            auth,
+            email as string,
+            password as string,
+        );
 
-            console.log('Sign up error: ', errorCode, errorMessage);
+        // Signed up
+        const user = userCredential.user;
 
-            switch (errorCode) {
-                case 'auth/email-already-in-use':
-                case 'auth/invalid-email':
-                case 'auth/weak-password':
-                case 'auth/invalid-password':
-                    return {
-                        message: errorMessage
-                            .replace('Firebase:', '')
-                            .replace(`(${errorCode})`, '')
-                            .replace('.', '')
-                            .trim(),
-                    };
-                default:
-                    return { message: 'Unknown error' };
-            }
-        });
+        await createSession(user.uid);
 
-    return userResponse;
+        redirect('/');
+        return { message: 'User created successfully' };
+    } catch (error) {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+
+        console.log('Sign up error: ', errorCode, errorMessage);
+
+        switch (errorCode) {
+            case 'auth/email-already-in-use':
+            case 'auth/invalid-email':
+            case 'auth/weak-password':
+            case 'auth/invalid-password':
+                return {
+                    message: errorMessage
+                        .replace('Firebase:', '')
+                        .replace(`(${errorCode})`, '')
+                        .replace('.', '')
+                        .trim(),
+                };
+            default:
+                return { message: 'Unknown error' };
+        }
+    }
 };
 
 export const signOut = async () => {
-    signoutUser(auth)
-        .then(() => {
-            // Sign-out successful.
-        })
-        .catch((error) => {
-            // An error happened.
-        });
+    try {
+        await signoutUser(auth);
+        await deleteSession();
+
+        redirect('/login');
+    } catch (error) {
+        console.error('Sign out error: ', error.code, error.message);
+    }
 };
 
 // export const signInWithGoogle = async () => {

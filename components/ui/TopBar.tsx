@@ -1,10 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { ChevronDown, Home, Moon, Sun, User } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { ChevronDown, Home, User } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -12,7 +10,8 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/DropdownMenu';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 // Mock user type
 type User = {
@@ -27,7 +26,7 @@ const subApps = [
     { name: 'App 3', path: '/app3' },
 ];
 
-export function TopBar() {
+export function TopBar({ user }: { user: boolean | null }) {
     return (
         <div className="bg-background border-b">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -67,8 +66,8 @@ export function TopBar() {
                         </DropdownMenu>
                     </div>
                     <div className="flex items-center">
-                        <ModeToggle />
-                        <UserButton />
+                        <ThemeToggle />
+                        <UserButton user={user} />
                     </div>
                 </div>
             </div>
@@ -76,13 +75,10 @@ export function TopBar() {
     );
 }
 
-const UserButton = () => {
-    // Mock authentication state
-    const [user, setUser] = useState<User | null>(null);
-
+const UserButton = ({ user }: { user: boolean | null }) => {
     const handleLogout = () => {
         // Mock logout
-        setUser(null);
+        // setUser(null);
     };
 
     return user ? (
@@ -98,12 +94,12 @@ const UserButton = () => {
             <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                        <p className="text-sm leading-none font-medium">
+                        {/* <p className="text-sm leading-none font-medium">
                             {user.name}
                         </p>
                         <p className="text-muted-foreground text-xs leading-none">
                             {user.email}
-                        </p>
+                        </p> */}
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -117,32 +113,5 @@ const UserButton = () => {
         </DropdownMenu>
     ) : (
         <Link href="/login">Log in</Link>
-    );
-};
-
-const ModeToggle = () => {
-    const { setTheme } = useTheme();
-
-    return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
-                    <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-                    <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-                    <span className="sr-only">Toggle theme</span>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme('light')}>
-                    Light
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('dark')}>
-                    Dark
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('system')}>
-                    System
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
     );
 };

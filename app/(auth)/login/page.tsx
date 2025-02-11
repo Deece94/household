@@ -3,7 +3,7 @@
 import { useActionState } from 'react';
 import { signIn } from '@/app/actions/auth';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import {
     Card,
     CardContent,
@@ -11,8 +11,8 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
 
 export default function LoginPage() {
     const [state, loginAction, pending] = useActionState(signIn, {
