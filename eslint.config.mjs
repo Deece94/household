@@ -19,6 +19,12 @@ const eslintConfig = tseslint.config(
     tseslint.configs.strict,
     tseslint.configs.stylistic,
     eslintPluginUnicorn.configs.recommended,
+    {
+        rules: {
+            'unicorn/prevent-abbreviations': 'off',
+            'unicorn/filename-case': 'off',
+        },
+    },
     // Leave last
     eslintConfigPrettier,
 );

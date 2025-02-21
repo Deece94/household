@@ -6,10 +6,10 @@ import { cookies } from 'next/headers';
 const secretKey = process.env.SESSION_SECRET;
 const encodedKey = new TextEncoder().encode(secretKey);
 
-type Payload = {
+interface Payload {
     uuid: string;
     expiresAt: Date;
-};
+}
 
 export async function encrypt(payload: Payload) {
     return new SignJWT(payload)
@@ -25,8 +25,8 @@ export async function decrypt(session: string | undefined = '') {
             algorithms: ['HS256'],
         });
         return payload as Payload;
-    } catch (e) {
-        console.log('Failed to verify session', e);
+    } catch (error) {
+        console.log('Failed to verify session', error);
     }
 }
 
@@ -45,11 +45,12 @@ export async function createSession(uuid: string) {
 }
 
 export async function updateSession() {
-    const session = (await cookies()).get('session')?.value;
+    const sessionCookies = await cookies();
+    const session = sessionCookies.get('session')?.value;
     const payload = await decrypt(session);
 
     if (!session || !payload) {
-        return null;
+        return;
     }
 
     const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);

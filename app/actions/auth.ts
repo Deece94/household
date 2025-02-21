@@ -1,20 +1,18 @@
 'use server';
 
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { createSession, deleteSession } from '@/lib/session';
+import { getErrorMessage, getFbErrorCode } from '@/lib/utilities';
 import {
     createUserWithEmailAndPassword,
-    GoogleAuthProvider,
     signInWithEmailAndPassword,
-    signInWithPopup,
     signOut as signoutUser,
 } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { redirect } from 'next/navigation';
 
-const provider = new GoogleAuthProvider();
-
 export const signIn = async (
-    prevState: { message: string },
+    _previousState: { message: string },
     formData: FormData,
 ) => {
     const email = formData.get('email');
@@ -39,16 +37,18 @@ export const signIn = async (
 
         return { message: 'Sign in successful' };
     } catch (error) {
-        console.error('Sign in error: ', error.code, error.message);
+        console.error(
+            'Sign in error:',
+            getErrorMessage(error),
+            getFbErrorCode(error),
+        );
 
-        return {
-            message: 'Invalid credentials',
-        };
+        return { message: 'Invalid credentials' };
     }
 };
 
 export const signUp = async (
-    prevState: { message: string },
+    _previousState: { message: string },
     formData: FormData,
 ) => {
     const name = formData.get('name');
@@ -76,19 +76,28 @@ export const signUp = async (
 
         await createSession(user.uid);
 
+        if (user) {
+            const userReference = doc(db, 'users', user.uid);
+            const userSnap = await getDoc(userReference);
+
+            if (!userSnap.exists()) {
+                await setDoc(userReference, { name: name });
+            }
+        }
+
         redirect('/');
         return { message: 'User created successfully' };
     } catch (error) {
-        const errorCode = error.code;
-        const errorMessage = error.message;
+        const errorCode = getFbErrorCode(error);
+        const errorMessage = getErrorMessage(error);
 
-        console.log('Sign up error: ', errorCode, errorMessage);
+        console.log('Sign up error:', errorCode, errorMessage);
 
         switch (errorCode) {
             case 'auth/email-already-in-use':
             case 'auth/invalid-email':
             case 'auth/weak-password':
-            case 'auth/invalid-password':
+            case 'auth/invalid-password': {
                 return {
                     message: errorMessage
                         .replace('Firebase:', '')
@@ -96,8 +105,10 @@ export const signUp = async (
                         .replace('.', '')
                         .trim(),
                 };
-            default:
+            }
+            default: {
                 return { message: 'Unknown error' };
+            }
         }
     }
 };
@@ -109,7 +120,11 @@ export const signOut = async () => {
 
         redirect('/login');
     } catch (error) {
-        console.error('Sign out error: ', error.code, error.message);
+        console.error(
+            'Sign out error:',
+            getErrorMessage(error),
+            getFbErrorCode(error),
+        );
     }
 };
 
