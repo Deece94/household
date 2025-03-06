@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { getUser } from '@/lib/dal';
-import { TopBar } from '@/components/ui/TopBar';
+import { TopBar } from '@/components/ui/top-bar';
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
     const user = await getUser();

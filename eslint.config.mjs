@@ -22,7 +22,6 @@ const eslintConfig = tseslint.config(
     {
         rules: {
             'unicorn/prevent-abbreviations': 'off',
-            'unicorn/filename-case': 'off',
         },
     },
     // Leave last

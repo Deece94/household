@@ -2,7 +2,7 @@
 
 import { ChevronDown, Home, User } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,8 +10,8 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/DropdownMenu';
-import { ThemeToggle } from '@/components/ui/ThemeToggle';
+} from '@/components/ui/dropdown-menu';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 // Mock user type
 type User = {
