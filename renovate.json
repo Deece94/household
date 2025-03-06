@@ -1,0 +1,10 @@
+{
+    "extends": ["config:base"],
+    "packageRules": [
+      {
+        "matchManagers": ["npm"],
+        "matchPackagePatterns": ["*"],
+        "schedule": ["daily"]
+      }
+    ]
+  }
