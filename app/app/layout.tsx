@@ -1,9 +1,8 @@
 import { ReactNode } from 'react';
-import { getUser } from '@/lib/dal';
 import { TopBar } from '@/components/ui/top-bar';
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
-    const user = await getUser();
+    const user = null;
     return (
         <div className="flex min-h-screen flex-col">
             <TopBar user={user} />
