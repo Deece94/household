@@ -1,0 +1,14 @@
+{
+    "extends": ["config:recommended", "mergeConfidence:all-badges" ],
+    "enabledManagers": ["npm"],
+    "baseBranches": ["dev"],
+    "packageRules": [
+        {
+            "description": "Automatically merge minor and patch-level updates",
+            "matchUpdateTypes": ["minor", "patch"],
+            "automerge": true,
+            "schedule": ["daily"],
+            "automergeType": "branch"
+        }
+    ]
+}
