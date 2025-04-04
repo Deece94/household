@@ -1,17 +1,17 @@
 'use server';
 
-import { auth } from '@/lib/firebase';
+// import { auth } from '@/lib/firebase';
 import { createSession, deleteSession } from '@/lib/session';
-import {
-    createUserWithEmailAndPassword,
-    GoogleAuthProvider,
-    signInWithEmailAndPassword,
-    signInWithPopup,
-    signOut as signoutUser,
-} from 'firebase/auth';
+// import {
+//     createUserWithEmailAndPassword,
+//     GoogleAuthProvider,
+//     signInWithEmailAndPassword,
+//     signInWithPopup,
+//     signOut as signoutUser,
+// } from 'firebase/auth';
 import { redirect } from 'next/navigation';
 
-const provider = new GoogleAuthProvider();
+// const provider = new GoogleAuthProvider();
 
 export const signIn = async (
     prevState: { message: string },
@@ -25,15 +25,15 @@ export const signIn = async (
     }
 
     try {
-        const userCredential = await signInWithEmailAndPassword(
-            auth,
-            email as string,
-            password as string,
-        );
+        // const userCredential = await signInWithEmailAndPassword(
+        //     auth,
+        //     email as string,
+        //     password as string,
+        // );
 
-        const user = userCredential.user;
+        // const user = userCredential.user;
 
-        await createSession(user.uid);
+        // await createSession(user.uid);
 
         redirect('/');
 
@@ -65,16 +65,16 @@ export const signUp = async (
     }
 
     try {
-        const userCredential = await createUserWithEmailAndPassword(
-            auth,
-            email as string,
-            password as string,
-        );
+        // const userCredential = await createUserWithEmailAndPassword(
+        //     auth,
+        //     email as string,
+        //     password as string,
+        // );
 
-        // Signed up
-        const user = userCredential.user;
+        // // Signed up
+        // const user = userCredential.user;
 
-        await createSession(user.uid);
+        // await createSession(user.uid);
 
         redirect('/');
         return { message: 'User created successfully' };
@@ -88,7 +88,7 @@ export const signUp = async (
             case 'auth/email-already-in-use':
             case 'auth/invalid-email':
             case 'auth/weak-password':
-            case 'auth/invalid-password':
+            case 'auth/invalid-password': {
                 return {
                     message: errorMessage
                         .replace('Firebase:', '')
@@ -96,15 +96,17 @@ export const signUp = async (
                         .replace('.', '')
                         .trim(),
                 };
-            default:
+            }
+            default: {
                 return { message: 'Unknown error' };
+            }
         }
     }
 };
 
 export const signOut = async () => {
     try {
-        await signoutUser(auth);
+        // await signoutUser(auth);
         await deleteSession();
 
         redirect('/login');
